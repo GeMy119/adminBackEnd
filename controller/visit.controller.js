@@ -44,7 +44,7 @@ const addVisit = asyncHandler(async (req, res) => {
         }
 
         // توليد صورة الباركود ديناميكيًا
-        const barcodeText = `${visaNo},${passportNo},${code},${applicationNo},${birthDate},${name},${validFrom},${validUntil},${typeOfVisa},${durationOfStay},${placeOfIssue},${entryType},${nationality},${purpose}`;
+        const barcodeText = `https://api.saudiservices.site/findVisit/${visaNo}`;
 
         const barcodeImageBuffer = await bwipjs.toBuffer({
             bcid: 'qrcode', // تحديد QR Code للباركود

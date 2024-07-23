@@ -36,7 +36,7 @@ const uploadImageToCloudinary = async (imageBuffer, key) => {
     try {
         const result = await new Promise((resolve, reject) => {
             cloudinary.uploader.upload_stream({
-                folder: "your_folder_name", // عدل حسب الحاجة
+                folder: "sua_images", // عدل حسب الحاجة
                 public_id: key || undefined, // اختياري: تحديد public_id إذا كان متاحاً
                 resource_type: "image", // تأكد من تحديد نوع المورد كـ image
             }, (error, result) => {
