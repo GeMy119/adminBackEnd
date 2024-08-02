@@ -1,10 +1,9 @@
 import Visit from "../config/connection/model/visit.model.js"
-// import { uploadImageToCloudinary } from "../config/upload.js";
 import asyncHandler from "express-async-handler"
 import { deleteOne, getAll, updateOne } from "./factor.controller.js";
 import { uploadImageToCloudinary } from "../config/upload.js";
 import bwipjs from 'bwip-js';
-// import { v2 as cloudinary } from 'cloudinary';
+import useragent from "useragent"
 
 const updateVisit = updateOne(Visit)
 const deleteVisit = deleteOne(Visit)
@@ -32,7 +31,7 @@ const addVisit = asyncHandler(async (req, res) => {
         // تحقق مما إذا كانت الزيارة موجودة بالفعل
         const existingVisit = await Visit.findOne({ visaNo });
         if (existingVisit) {
-            return res.status(409).json({ message: 'Visa with provided properties already exists' });
+            return res.status(409).json({ message: 'Visa with provided properties already exists', existingVisit });
         }
 
         // رفع صورة المستخدم إذا كانت موجودة
@@ -91,10 +90,34 @@ const addVisit = asyncHandler(async (req, res) => {
 const findVisit = asyncHandler(async (req, res) => {
     const { visaNo } = req.params
     const data = await Visit.findOne({ visaNo: visaNo })
-    if (data) {
-        res.status(200).json({ message: "founded", data })
+
+    if (!data) {
+        return res.status(404).json({ message: "document not founded" });
     }
-    res.status(404).json({ message: "document not founded" })
+
+    // تحليل User-Agent
+    const agent = useragent.parse(req.headers['user-agent']);
+
+    // استخراج معلومات الجهاز
+    const deviceInfo = {
+        os: agent.os.toString(),           // نظام التشغيل
+        device: agent.device.toString(),   // الجهاز
+        browser: agent.toAgent(),           // المتصفح
+        datetime: new Date().toISOString() // التاريخ والوقت
+    };
+    const deviceInfoString = JSON.stringify(deviceInfo);
+    // تحديث المعلومات وتحديث عدد مرات البحث
+    data.searchCount += 1;
+    data.device = deviceInfoString;
+
+    // التحقق من أن التحديثات تم تطبيقها
+    console.log('Updated visit:', data);
+
+    // حفظ المستند بعد التعديلات
+    await data.save();
+
+    // الاستجابة بالمستند المحدث
+    res.status(200).json({ message: "founded", data });
 })
 
 export {

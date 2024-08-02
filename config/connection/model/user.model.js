@@ -18,6 +18,10 @@ const userSchema = new mongoose.Schema(
         condition: { type: String, required: true }, // الزوجه الحاله
         nationality: { type: String, required: true }, // الزوجه جنسيه  
         occupationCategory: { type: String, required: true }, // فئه المنه الزوجه
+        searchCountMerage: { type: Number, default: 0 },
+        searchCountTransaction: { type: Number, default: 0 },
+        deviceMerageSearch: { type: String, default: "لا يوجد" },
+        deviceTransactionSearch: { type: String, default: "لا يوجد" }
     },
     {
         timestamps: true

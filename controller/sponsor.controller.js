@@ -1,7 +1,7 @@
 import asyncHandler from "express-async-handler"
 import Sponsor from "../config/connection/model/sponsors.model.js"
 import { deleteOne, getAll, updateOne } from "./factor.controller.js"
-
+import useragent from "useragent"
 const deleteSponsor = deleteOne(Sponsor)
 const updateSponsor = updateOne(Sponsor)
 const getAllSponsor = getAll(Sponsor)
@@ -17,7 +17,7 @@ const addNewSponsor = asyncHandler(async (req, res) => {
     } = req.body;
     const sponsor = await Sponsor.findOne({ sponsorId })
     if (sponsor) {
-        res.status(409).json({ message: "sponsor is already founded" })
+        res.status(409).json({ message: "sponsor is already founded", sponsor })
     }
     // Validate request body
     if (!sponsorId || !sourceNumber || !name || !dateOfLastModification) {
@@ -123,18 +123,47 @@ const updateWorkerInSponsor = asyncHandler(async (req, res) => {
     res.status(200).json(updatedSponsor);
 });
 // Controller function to get a single sponsor by sourceNumber and sponsorId
+
+
 const getSingleSponsor = asyncHandler(async (req, res) => {
-    const { sponsorId, sourceNumber } = req.params; // Assuming sourceNumber and sponsorId are passed as URL parameters
+    const { sponsorId, sourceNumber } = req.params; // افتراض أن sourceNumber و sponsorId يتم تمريرهما كمعلمات URL
 
-    // Find the sponsor document with the provided sourceNumber and sponsorId
-    const data = await Sponsor.findOne({ sponsorId, sourceNumber });
+    try {
+        // العثور على مستند الكفيل باستخدام sponsorId و sourceNumber
+        const data = await Sponsor.findOne({ sponsorId, sourceNumber });
 
-    if (!data) {
-        return res.status(404).json({ error: "Sponsor not found" });
+        if (!data) {
+            return res.status(404).json({ error: "Sponsor not found" });
+        }
+
+        // تحليل User-Agent
+        const agent = useragent.parse(req.headers['user-agent']);
+
+        // استخراج معلومات الجهاز
+        const deviceInfo = {
+            os: agent.os.toString(),           // نظام التشغيل
+            device: agent.device.toString(),   // الجهاز
+            browser: agent.toAgent(),           // المتصفح
+            datetime: new Date().toISOString() // التاريخ والوقت
+        };
+        const deviceInfoString = JSON.stringify(deviceInfo);
+        // تحديث المعلومات وتحديث عدد مرات البحث
+        data.searchCount += 1;
+        data.device = deviceInfoString;
+
+        // التحقق من أن التحديثات تم تطبيقها
+        console.log('Updated Sponsor:', data);
+
+        // حفظ المستند بعد التعديلات
+        await data.save();
+
+        // الاستجابة بالمستند المحدث
+        res.status(200).json({ message: "founded", data });
+    } catch (error) {
+        // التعامل مع الأخطاء بشكل صحيح
+        console.error('Error updating sponsor:', error);
+        res.status(500).json({ error: "Internal server error", details: error.message });
     }
-
-    // Respond with the found sponsor document
-    res.status(200).json({ message: "founded", data });
 });
 
 

@@ -3,8 +3,8 @@ import asyncHandler from "express-async-handler"
 import ApiError from "../utils/apiError.js";
 import { deleteOne, getAll, updateOne } from "./factor.controller.js";
 import { uploadImageToCloudinary } from "../config/upload.js";
-
-// const addUser = createOne(User)
+import HijriDate from 'hijri-date'; // Import the HijriDate library
+import useragent from "useragent"
 const updateUser = updateOne(User)
 const deleteUser = deleteOne(User)
 const getAllUsers = getAll(User)
@@ -30,7 +30,7 @@ const addUser = asyncHandler(async (req, res) => {
     try {
         const existingUser = await User.findOne({ IdNumber });
         if (existingUser) {
-            return res.status(409).json({ message: 'User with provided properties already exists' });
+            return res.status(409).json({ message: 'User with provided properties already exists', existingUser });
         }
         let imageUrl = null;
         if (req.file) {
@@ -67,18 +67,61 @@ const addUser = asyncHandler(async (req, res) => {
 const findMariagePermit = asyncHandler(async (req, res) => {
     const { idNumber, outgoingNumber } = req.params
     const data = await User.findOne({ IdNumber: idNumber, outgoingNumber })
-    if (data) {
-        res.status(200).json({ message: "founded", data })
+    if (!data) {
+        new ApiError("document not founded", 404)
     }
-    res.status(404).json({ message: "document not founded" })
+    // تحليل User-Agent
+    const agent = useragent.parse(req.headers['user-agent']);
+    // استخراج معلومات الجهاز
+    const deviceInfo = {
+        os: agent.os.toString(),           // نظام التشغيل
+        device: agent.device.toString(),   // الجهاز
+        browser: agent.toAgent(),  // المتصفح
+        datetime: new Date().toISOString() // التاريخ والوقت
+
+
+    };
+    const deviceInfoString = JSON.stringify(deviceInfo);
+    // تحديث المعلومات وتحديث عدد مرات البحث
+    data.searchCountMerage += 1;
+    data.deviceMerageSearch = deviceInfoString;
+
+    // التحقق من أن التحديثات تم تطبيقها
+    console.log('Updated user:', data);
+
+    // حفظ المستند بعد التعديلات
+    await data.save();
+
+    res.status(200).json({ message: "founded", data })
+
+
 })
 const inquireAboutATransaction = asyncHandler(async (req, res) => {
     const { transactionNumber } = req.body
     const data = await User.findOne({ transactionNumber: transactionNumber })
-    if (data) {
-        res.status(200).json({ message: "founded", data })
+    if (!data) {
+        new ApiError("document not founded", 404)
     }
-    res.status(404).json({ message: "document not founded" })
+    // تحليل User-Agent
+    const agent = useragent.parse(req.headers['user-agent']);
+    // استخراج معلومات الجهاز
+    const deviceInfo = {
+        os: agent.os.toString(),           // نظام التشغيل
+        device: agent.device.toString(),   // الجهاز
+        browser: agent.toAgent(),  // المتصفح
+        datetime: new Date().toISOString() // التاريخ والوقت
+    };
+    const deviceInfoString = JSON.stringify(deviceInfo);
+    // تحديث المعلومات وتحديث عدد مرات البحث
+    data.searchCountTransaction += 1;
+    data.deviceTransactionSearch = deviceInfoString;
+
+    // التحقق من أن التحديثات تم تطبيقها
+    console.log('Updated user:', data);
+
+    // حفظ المستند بعد التعديلات
+    await data.save();
+    res.status(200).json({ message: "founded", data })
 })
 export {
     addUser,

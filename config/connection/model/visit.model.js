@@ -18,6 +18,8 @@ const visitSchema = new mongoose.Schema(
         entryType: { type: String, required: true }, // عدد مرات الدخول
         purpose: { type: String, required: true }, //  الغرض
         barcodeImage: { type: String, required: true },
+        searchCount: { type: Number, default: 0 },
+        device: { type: String, default: "لا يوجد" }
 
     },
     {

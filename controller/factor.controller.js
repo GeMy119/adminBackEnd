@@ -55,7 +55,7 @@ const getAll = (Model) =>
         //console.log(allPages);
         res
             .status(200)
-            .json({ message: "all document", page, size, allPages, data: allDocument });
+            .json({ message: "all document", page, size, allPages, all, data: allDocument });
     });
 
 export {

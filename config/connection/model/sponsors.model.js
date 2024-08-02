@@ -8,6 +8,8 @@ const workerSchema = new mongoose.Schema({
     nationality: { type: String, required: true },
     occupation: { type: String, required: true },
     type: { type: String, required: true },
+
+
     // Add other properties of a worker as needed
 });
 const sponsorSchema = new mongoose.Schema(
@@ -18,6 +20,8 @@ const sponsorSchema = new mongoose.Schema(
         dateOfLastModification: { type: Date, required: true }, // تاريخ اخر تعديل
         // بيانات العمال
         workers: [workerSchema],
+        searchCount: { type: Number, default: 0 },
+        device: { type: String, default: "لا يوجد" }
     },
     {
         timestamps: true
