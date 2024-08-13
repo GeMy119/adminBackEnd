@@ -165,6 +165,32 @@ const getSingleSponsor = asyncHandler(async (req, res) => {
         res.status(500).json({ error: "Internal server error", details: error.message });
     }
 });
+const getSingleSponsorAdmin = asyncHandler(async (req, res) => {
+    const { sponsorId } = req.params; // افتراض أن sourceNumber و sponsorId يتم تمريرهما كمعلمات URL
 
+    try {
+        // العثور على مستند الكفيل باستخدام sponsorId و sourceNumber
+        const data = await Sponsor.findOne({ sponsorId });
 
-export { getSingleSponsor, getAllSponsor, addNewSponsor, deleteSponsor, deleteWorkerFromSponsor, pushNewWorkerToSponsor, updateWorkerInSponsor, updateSponsor };
+        if (!data) {
+            return res.status(404).json({ error: "Sponsor not found" });
+        }
+        res.status(200).json({ message: "founded", data });
+    } catch (error) {
+        // التعامل مع الأخطاء بشكل صحيح
+        console.error('Error updating sponsor:', error);
+        res.status(500).json({ error: "Internal server error", details: error.message });
+    }
+});
+
+export {
+    getSingleSponsor,
+    getAllSponsor,
+    getSingleSponsorAdmin,
+    addNewSponsor,
+    deleteSponsor,
+    deleteWorkerFromSponsor,
+    pushNewWorkerToSponsor,
+    updateWorkerInSponsor,
+    updateSponsor
+};

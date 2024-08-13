@@ -7,9 +7,9 @@ const visitSchema = new mongoose.Schema(
         code: { type: String, required: true }, //رقم السجل   
         applicationNo: { type: String, required: true }, // رقم الطلب
         name: { type: String, required: true },
-        birthDate: { type: Date, required: true }, // تاريخ الميلاد
-        validFrom: { type: Date, required: true }, // صالحه اعتبارا من 
-        validUntil: { type: Date, required: true }, // صالحه لغايه
+        birthDate: { type: String, required: true }, // تاريخ الميلاد
+        validFrom: { type: String, required: true }, // صالحه اعتبارا من 
+        validUntil: { type: String, required: true }, // صالحه لغايه
         image: { type: String, required: true },
         typeOfVisa: { type: String, required: true }, // نوع التأشيره
         durationOfStay: { type: String, required: true }, // مده الاقامه

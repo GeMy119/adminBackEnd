@@ -8,9 +8,9 @@ const userSchema = new mongoose.Schema(
         userOccupation: { type: String, required: true }, //المهنه الزوج 
         userSerialNumber: { type: String, required: true }, // الزوج
         name: { type: String, required: true }, // الزوج 
-        releaseDate: { type: Date, required: true }, // الزوج تاريخ الاصدار
+        releaseDate: { type: String, required: true }, // الزوج تاريخ الاصدار
         image: { type: String },
-        dateBoking: { type: Date, required: true },
+        dateBoking: { type: String, required: true },
         // الاستعلام عن تصريح الزواج
         WifeSerialNumber: { type: String, required: true }, // الزوجه
         wifeName: { type: String, required: true },

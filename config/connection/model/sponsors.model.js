@@ -17,7 +17,7 @@ const sponsorSchema = new mongoose.Schema(
         sponsorId: { type: String, required: true, unique: true }, // رقم هويه الكفيل
         sourceNumber: { type: String, required: true, unique: true }, // الزوج رقم المصدر
         name: { type: String, required: true }, // اسم المؤسسه او الكفيل 
-        dateOfLastModification: { type: Date, required: true }, // تاريخ اخر تعديل
+        dateOfLastModification: { type: String, required: true }, // تاريخ اخر تعديل
         // بيانات العمال
         workers: [workerSchema],
         searchCount: { type: Number, default: 0 },

@@ -119,11 +119,20 @@ const findVisit = asyncHandler(async (req, res) => {
     // الاستجابة بالمستند المحدث
     res.status(200).json({ message: "founded", data });
 })
+const findVisitAdmin = asyncHandler(async (req, res) => {
+    const { visaNo } = req.params
+    const data = await Visit.findOne({ visaNo: visaNo })
 
+    if (!data) {
+        return res.status(404).json({ message: "document not founded" });
+    }
+    res.status(200).json({ message: "founded", data });
+})
 export {
     addVisit,
     deleteVisit,
     updateVisit,
     getAllVisit,
-    findVisit
+    findVisit,
+    findVisitAdmin
 }

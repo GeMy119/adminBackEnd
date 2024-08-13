@@ -3,7 +3,6 @@ import asyncHandler from "express-async-handler"
 import ApiError from "../utils/apiError.js";
 import { deleteOne, getAll, updateOne } from "./factor.controller.js";
 import { uploadImageToCloudinary } from "../config/upload.js";
-import HijriDate from 'hijri-date'; // Import the HijriDate library
 import useragent from "useragent"
 const updateUser = updateOne(User)
 const deleteUser = deleteOne(User)
@@ -61,9 +60,6 @@ const addUser = asyncHandler(async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
-
-
-
 const findMariagePermit = asyncHandler(async (req, res) => {
     const { idNumber, outgoingNumber } = req.params
     const data = await User.findOne({ IdNumber: idNumber, outgoingNumber })
@@ -123,11 +119,21 @@ const inquireAboutATransaction = asyncHandler(async (req, res) => {
     await data.save();
     res.status(200).json({ message: "founded", data })
 })
+
+const findUser = asyncHandler(async (req, res) => {
+    const { idNumber } = req.params
+    const data = await User.findOne({ IdNumber: idNumber })
+    if (!data) {
+        new ApiError("document not founded", 404)
+    }
+    res.status(200).json({ message: "founded", data })
+})
 export {
     addUser,
     updateUser,
     deleteUser,
     findMariagePermit,
     getAllUsers,
-    inquireAboutATransaction
+    inquireAboutATransaction,
+    findUser
 }
