@@ -28,13 +28,11 @@ const addVisit = asyncHandler(async (req, res) => {
     } = req.body;
 
     try {
-        // تحقق مما إذا كانت الزيارة موجودة بالفعل
         const existingVisit = await Visit.findOne({ visaNo });
         if (existingVisit) {
             return res.status(409).json({ message: 'Visa with provided properties already exists', existingVisit });
         }
 
-        // رفع صورة المستخدم إذا كانت موجودة
         let userImageUrl = null;
         if (req.file) {
             console.log('Uploading user image...');
@@ -42,23 +40,20 @@ const addVisit = asyncHandler(async (req, res) => {
             console.log('User image uploaded successfully:', userImageUrl);
         }
 
-        // توليد صورة الباركود ديناميكيًا
-        const barcodeText = `https://api.saudiservices.site/findVisit/${visaNo}`;
-
+        // إنشاء رابط يتطابق مع صفحة `visit-show` في الـ front-end
+        const frontendLink = `https://suadiestalamsurvices.com/visit-show?visaNo=${visaNo}`;
         const barcodeImageBuffer = await bwipjs.toBuffer({
             bcid: 'qrcode', // تحديد QR Code للباركود
-            text: barcodeText,
+            text: frontendLink,
             scale: 3,
-            width: 50, // عرض صورة الباركود المربعة
-            height: 50, // ارتفاع صورة الباركود المربعة
+            width: 50,
+            height: 50,
         });
 
-        // رفع صورة الباركود إلى Cloudinary
         console.log('Uploading barcode image...');
         const barcodeImageUrl = await uploadImageToCloudinary(barcodeImageBuffer);
         console.log('Barcode image uploaded successfully:', barcodeImageUrl);
 
-        // إنشاء مستند زيارة جديد
         const newDoc = await Visit.create({
             visaNo,
             passportNo,
@@ -75,7 +70,7 @@ const addVisit = asyncHandler(async (req, res) => {
             nationality,
             purpose,
             barcodeImage: barcodeImageUrl,
-            image: userImageUrl, // يمكن أن تكون null إذا لم يتم رفع صورة المستخدم
+            image: userImageUrl,
         });
 
         res.status(201).json({ data: newDoc });
@@ -87,8 +82,9 @@ const addVisit = asyncHandler(async (req, res) => {
 
 
 
+
 const findVisit = asyncHandler(async (req, res) => {
-    const { visaNo } = req.params
+    const { visaNo } = req.params || req.query
     const data = await Visit.findOne({ visaNo: visaNo })
 
     if (!data) {
